@@ -1,7 +1,26 @@
+var exphbs = require('express-handlebars');
+const bodyParser = require('body-parser');
 const express = require('express')
+const expressValidator = require('express-validator');
 const app = express()
-const port = 3000
+const posts = require('./controllers/posts');
 
-app.get('/', (req, res) => res.send('Hello World!'))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(expressValidator());
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+// Set db
+require('./data/reddit-db');
+
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
+
+app.get('/', (req,res) => {
+   res.render('home')
+})
+app.use('/posts', posts)
+
+app.listen(3000, () => {
+    console.log('App listening on port 3000!')
+})
+module.exports = app;
