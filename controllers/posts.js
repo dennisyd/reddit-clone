@@ -4,14 +4,14 @@ const router = express.Router();
 
 const Post = require('../models/post');
 
-router.post('/',(req,res) => {
+router.get('/',(req,res) => {
    const post = new Post(req.body);
 
    post.save()
 
    Post.find({})
    .then(posts => {
-   	res.render('posts-index', {posts});
+   	res.render('posts-index', { posts });
    })
    .catch(err => {
    	console.log(err.message);
