@@ -4,6 +4,7 @@ const express = require('express')
 const expressValidator = require('express-validator');
 const app = express()
 const posts = require('./controllers/posts');
+const comments = require('./controllers/comments.js')(app);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
