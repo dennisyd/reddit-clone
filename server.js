@@ -11,14 +11,31 @@ app.use(expressValidator());
 
 // Set db
 require('./data/reddit-db');
-
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
-// app.get('/', (req,res) => {
-//    res.render('home')
-// })
-app.use('/', posts)
+const Post = require('./models/post');
+app.get('/', (req,res) => {
+    Post.find({})
+    .then(posts => {
+    	res.render('posts-index', { posts });
+    })
+    .catch(err => {
+    	console.log(err.message);
+    })
+   //res.render('home')
+})
+
+app.get("/n/:subreddit", function(req, res) {
+  Post.find({ subreddit: req.params.subreddit })
+    .then(posts => {
+      res.render("posts-index", { posts });
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+app.use('/posts', posts)
 
 app.listen(3000, () => {
     console.log('App listening on port 3000!')

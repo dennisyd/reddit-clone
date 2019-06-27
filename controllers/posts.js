@@ -5,9 +5,9 @@ const router = express.Router();
 const Post = require('../models/post');
 
 router.get('/',(req,res) => {
-   const post = new Post(req.body);
-
-   post.save()
+   // const post = new Post(req.body);
+   //
+   // post.save()
 
    Post.find({})
    .then(posts => {
