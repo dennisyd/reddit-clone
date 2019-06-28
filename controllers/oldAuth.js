@@ -1,43 +1,40 @@
-const express = require('express');
-const router = express.Router();
-const User = require("../models/user");
 const jwt = require('jsonwebtoken');
-console.log("Recognizes controller")
-  // SIGN UP POST
-  router.get("/", (req, res) => {
-     console.log("Went here")
-     res.render('sign-up');
-   })
- router.get("/sign-up", (req, res) => {
-    console.log("Went here")
-    res.render('sign-up');
-  })
-  router.post("/sign-up", (req, res) => {
-    // Create User
-    const user = new User(req.body);
+const express = require('express');
+const User = require("../models/user");
+const router = express.Router();
 
-    user
-      .save()
-      .then(user => {
-        var token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: "60 days" });
-        res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
-        res.redirect("/");
-      })
-      .catch(err => {
-        console.log(err.message);
-        return res.status(400).send({ err: err });
-      });
+const app = express()
+  // SIGN UP POST
+ module.exports = (app) => {
+
+  app.get("/sign-up", (req, res) => {
+    res.render('sign-up');
   });
-  router.get('/logout', (req, res) => {
+
+  app.post('/sign-up', (req, res) => {
+    const user = new User(req.body);
+    console.log(req.params)
+    user.save().then(user => {
+        var token = jwt.sign({ _id: user._id}, process.env.SECRET, {expiresIn: "60 days"});
+        res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
+        res.redirect('/');
+    })
+    .catch(err => {
+        console.log(err.message);
+        return res.status(400).send({ err: err});
+    });
+});
+
+  app.get('/logout', (req, res) => {
     res.clearCookie('nToken');
     res.redirect('/');
 })
 
-router.get('/login', (req, res) => {
+app.get('/login', (req, res) => {
     res.render('log-in');
 });
 
-router.post("/log-in", (req, res) => {
+app.post("/login", (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
     User.findOne({ username }, "username password").then(user => {
@@ -59,4 +56,4 @@ router.post("/log-in", (req, res) => {
         });
     });
 
-module.exports = router
+}

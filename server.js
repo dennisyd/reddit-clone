@@ -6,7 +6,7 @@ const expressValidator = require('express-validator');
 const app = express()
 const posts = require('./controllers/posts');
 const comments = require('./controllers/comments.js')(app);
-const auth = require('./controllers/auth.js')
+const theauth = require('./controllers/auth');
 var cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 app.use(bodyParser.json());
@@ -39,8 +39,9 @@ app.get("/n/:subreddit", function(req, res) {
       console.log(err);
     });
 });
+app.use('/a', theauth)
 app.use('/posts', posts)
-app.use('/sign-up', auth)
+
 app.listen(3000, () => {
     console.log('App listening on port 3000!')
 })
