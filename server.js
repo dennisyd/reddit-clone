@@ -1,3 +1,4 @@
+require('dotenv').config();
 var exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const express = require('express')
@@ -5,7 +6,9 @@ const expressValidator = require('express-validator');
 const app = express()
 const posts = require('./controllers/posts');
 const comments = require('./controllers/comments.js')(app);
-
+const auth = require('./controllers/auth.js')
+var cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(expressValidator());
@@ -14,7 +17,7 @@ app.use(expressValidator());
 require('./data/reddit-db');
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
-
+app.use(cookieParser());
 const Post = require('./models/post');
 app.get('/', (req,res) => {
     Post.find({})
@@ -37,7 +40,7 @@ app.get("/n/:subreddit", function(req, res) {
     });
 });
 app.use('/posts', posts)
-
+app.use('/sign-up', auth)
 app.listen(3000, () => {
     console.log('App listening on port 3000!')
 })
