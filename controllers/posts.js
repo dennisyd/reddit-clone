@@ -4,33 +4,32 @@ const router = express.Router();
 
 const Post = require('../models/post');
 
-router.get('/',(req,res) => {
-   // const post = new Post(req.body);
-   //
-   // post.save()
+router.get("/", (req, res) => {
+  var currentUser = req.user;
 
-   Post.find({})
-   .then(posts => {
-   	res.render('posts-index', { posts });
-   })
-   .catch(err => {
-   	console.log(err.message);
-   })
+  Post.find({})
+    .then(posts => {
+      res.render("posts-index", { posts, currentUser });
+    })
+    .catch(err => {
+      console.log(err.message);
+    });
 })
 
 router.get('/new',(req,res) => {
    res.render('posts-new')
 })
-router.post('/new', (req, res) => {
-    // INSTANTIATE INSTANCE OF POST MODEL
-    const post = new Post(req.body);
-    console.log("Saving...")
-    // SAVE INSTANCE OF POST MODEL TO DB
-    post.save((err, post) => {
-      // REDIRECT TO THE ROOT
+router.post("/new", (req, res) => {
+  if (req.user) {
+    var post = new Post(req.body);
+
+    post.save(function(err, post) {
       return res.redirect(`/`);
-    })
-  });
+    });
+  } else {
+    return res.status(401); // UNAUTHORIZED
+  }
+});
 
 router.get('/:id', (req, res) => {
     Post.findById(req.params.id).populate('comments').then((post) => {

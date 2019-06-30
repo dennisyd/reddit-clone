@@ -13,13 +13,16 @@
 
         <div class="pull-right">
             <ul class="nav navbar-nav navbar-right">
-      <li><a href="/a/logout">Logout</a></li>
-      <li><a href="/a/login">Login</a></li>
-      <li><a href="/a/sign-up">Sign Up</a></li>
-    </ul>
-            <a href="/posts/new" class="btn btn-primary navbar-btn">
-                New Post
-            </a>
+          {{#if currentUser}}
+            <li><a href="/a/logout">Logout</a></li>
+          {{else}}
+            <li><a href="/a/login">Login</a></li>
+            <li><a href="/a/sign-up">Sign Up</a></li>
+          {{/if}}
+        </ul>
+        {{#if currentUser}}
+                <a href="/posts/new" class="btn btn-primary navbar-btn"> New Post</a>
+            {{/if}}
         </div>
 
     </div>
