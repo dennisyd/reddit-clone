@@ -56,7 +56,7 @@ router.get("/:id", function (req, res) {
 
 // CREATE Comment
  const Comment = require('../models/comment');
- router.post("/posts/:postId/comments", function (req, res) {
+ router.post("/:postId/comments", function (req, res) {
         const comment = new Comment(req.body);
         comment.author = req.user._id;
         comment
@@ -79,5 +79,56 @@ router.get("/:id", function (req, res) {
                 console.log(err);
             });
     });
+
+    router.get("/:postId/comments/:commentId/replies/new", (req, res) => {
+    let post;
+    Post.findById(req.params.postId)
+      .then(p => {
+        post = p;
+        return Comment.findById(req.params.commentId);
+      })
+      .then(comment => {
+        res.render("replies-new", { post, comment });
+      })
+      .catch(err => {
+        console.log(err.message);
+      });
+  });
+  router.get("/:postId/comments/:commentId/replies", (req, res) => {
+      console.log("Get replies working....")
+      res.redirect(`/posts/${req.params.postId}`);
+  })
+  // CREATE REPLY
+  router.post("/:postId/comments/:commentId/replies", (req, res) => {
+    // TURN REPLY INTO A COMMENT OBJECT
+    console.log("Replies/new")
+    const reply = new Comment(req.body);
+    reply.author = req.user._id
+    // LOOKUP THE PARENT POST
+    Post.findById(req.params.postId)
+        .then(post => {
+            // FIND THE CHILD COMMENT
+            console.log("Comment found")
+            Promise.all([
+                reply.save(),
+                Comment.findById(req.params.commentId),
+            ])
+                .then(([reply, comment]) => {
+                    // ADD THE REPLY
+                    comment.comments.unshift(reply._id);
+
+                    return Promise.all([
+                        comment.save(),
+                    ]);
+                })
+                .then(() => {
+                    res.redirect(`/posts/${req.params.postId}`);
+                })
+                .catch(console.error);
+            // SAVE THE CHANGE TO THE PARENT DOCUMENT
+            console.log("Saving reply")
+            return post.save();
+        })
+});
 
 module.exports = router;
