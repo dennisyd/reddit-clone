@@ -41,7 +41,7 @@ const Post = require('./models/post');
 
 app.get("/n/:subreddit", function (req, res) {
     var currentUser = req.user;
-    Post.find({ subreddit: req.params.subreddit }).populate('author')
+    Post.find({ subreddit: req.params.subreddit }).lean()
         .then(posts => {
             res.render("posts-index", { posts, currentUser });
         })
