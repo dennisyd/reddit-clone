@@ -39,26 +39,28 @@ app.use(checkAuth);
 const Post = require('./models/post');
 
 
-app.get("/n/:subreddit", function(req, res) {
-  Post.find({ subreddit: req.params.subreddit })
-    .then(posts => {
-      res.render("posts-index", { posts });
-    })
-    .catch(err => {
-      console.log(err);
-    });
+app.get("/n/:subreddit", function (req, res) {
+    var currentUser = req.user;
+    Post.find({ subreddit: req.params.subreddit }).populate('author')
+        .then(posts => {
+            res.render("posts-index", { posts, currentUser });
+        })
+        .catch(err => {
+            console.log(err);
+        });
 });
-app.get("/", (req, res) => {
-  var currentUser = req.user;
-  console.log(currentUser)
-  Post.find({})
-    .then(posts => {
-      res.render("posts-index", { posts, currentUser });
+app.get('/', (req, res) => {
+        var currentUser = req.user;
+        // res.render('home', {});
+        console.log(req.cookies);
+        Post.find().populate('author')
+        .then(posts => {
+            res.render('posts-index', { posts, currentUser });
+            // res.render('home', {});
+        }).catch(err => {
+            console.log(err.message);
+        })
     })
-    .catch(err => {
-      console.log(err.message);
-    });
-});
 
 
 app.use('/a', theauth)
