@@ -44,23 +44,24 @@ router.post("/new", (req, res) => {
     });
 
 router.get("/:id", function (req, res) {
-        var currentUser = req.user;
-        // LOOK UP THE POST
+   var currentUser = req.user;
+   // LOOK UP THE POST
 
-        Post.findById(req.params.id).populate('comments').populate('author')
-            .then(post => {
-                res.render("posts-show", { post, currentUser });
-            })
-            .catch(err => {
-                console.log(err.message);
-            });
-    });
+   Post.findById(req.params.id).populate({path:'comments', populate: {path: 'author'}}).populate('author')
+       .then(post => {
+           res.render("posts-show", { post, currentUser });
+       })
+       .catch(err => {
+           console.log(err.message);
+       });
+});
 
 // CREATE Comment
  const Comment = require('../models/comment');
  router.post("/:postId/comments", function(req, res) {
    // INSTANTIATE INSTANCE OF MODEL
    const comment = new Comment(req.body);
+   comment.author = req.user._id;
 
    // SAVE INSTANCE OF Comment MODEL TO DB
    comment
